@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 | 醫師 | 週一 | 週二 | 週三 | 週四 | 週五 | 週六 |
 | 劉盈宏 | 早/午 | 晚 | 午 | - | 早/午 | - |
 | 毛琪瑛 | - | - | 早 | 早 | - | - |
-| 江唯真 | - | - | 晚 | - | - | 早 |
+| 江唯真 | - | - | - | 晚 | - | 早 |
 週日全天及週六下午/晚上休診。
 
 【復健治療服務時間】
@@ -80,7 +80,7 @@ export default async function handler(req, res) {
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-preview:generateContent?key=${GEMINI_API_KEY}`;
 
     const payload = {
       system_instruction: {
