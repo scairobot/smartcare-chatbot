@@ -239,24 +239,44 @@
   var inputValue = '';
 
   // 綁定輸入框事件
+  var isComposing = false;
+
   document.addEventListener('DOMContentLoaded', function() {
     var input = document.getElementById('msg-input');
-    input.addEventListener('input', function(e) {
+
+    // 追蹤中文輸入法狀態
+    input.addEventListener('compositionstart', function() {
+      isComposing = true;
+    });
+
+    input.addEventListener('compositionend', function(e) {
+      isComposing = false;
       inputValue = e.target.value;
     });
+
+    input.addEventListener('input', function(e) {
+      if (!isComposing) {
+        inputValue = e.target.value;
+      }
+    });
+
     input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !isComposing) {
         e.preventDefault();
         e.stopPropagation();
-        var msg = inputValue.trim();
-        clearInput();
+        // 直接讀 input.value 最可靠
+        var msg = input.value.trim();
+        input.value = '';
+        inputValue = '';
         doSend(msg);
         return false;
       }
     });
+
     document.getElementById('send-btn').addEventListener('click', function() {
-      var msg = inputValue.trim();
-      clearInput();
+      var msg = input.value.trim();
+      input.value = '';
+      inputValue = '';
       doSend(msg);
     });
   });
