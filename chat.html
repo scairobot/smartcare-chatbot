@@ -31,16 +31,20 @@
     background: var(--gray-50);
     color: var(--gray-900);
     -webkit-text-size-adjust: 100%;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
   }
 
   #app {
     display: flex;
     flex-direction: column;
     height: 100%;
+    height: 100dvh;
     max-width: 680px;
     margin: 0 auto;
     background: var(--white);
     box-shadow: 0 0 60px rgba(0,0,0,0.08);
+    position: relative;
   }
 
   /* Header */
@@ -506,13 +510,31 @@
     }
   }
 
- 
   // 修正 iOS 鍵盤彈出時的高度問題
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', function() {
-      document.getElementById('app').style.height = window.visualViewport.height + 'px';
-    });
+  function updateHeight() {
+    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    document.getElementById('app').style.height = h + 'px';
+    document.getElementById('app').style.maxHeight = h + 'px';
+    // 確保訊息區滾到最底
+    var msgs = document.getElementById('messages');
+    msgs.scrollTop = msgs.scrollHeight;
   }
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateHeight);
+    window.visualViewport.addEventListener('scroll', updateHeight);
+  }
+  window.addEventListener('resize', updateHeight);
+  updateHeight();
+
+  // 點擊輸入框時捲動到最底
+  document.getElementById('msg-input').addEventListener('focus', function() {
+    setTimeout(function() {
+      updateHeight();
+      var msgs = document.getElementById('messages');
+      msgs.scrollTop = msgs.scrollHeight;
+    }, 400);
+  });
 </script>
 </body>
 </html>
