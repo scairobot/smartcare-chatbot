@@ -148,18 +148,9 @@
     background: #f7f8fa;
   }
 
-  #sc-messages::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  #sc-messages::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  #sc-messages::-webkit-scrollbar-thumb {
-    background: #d0d5dd;
-    border-radius: 4px;
-  }
+  #sc-messages::-webkit-scrollbar { width: 4px; }
+  #sc-messages::-webkit-scrollbar-track { background: transparent; }
+  #sc-messages::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 4px; }
 
   .sc-msg {
     display: flex;
@@ -209,11 +200,7 @@
     flex-shrink: 0;
   }
 
-  .sc-avatar svg {
-    width: 16px;
-    height: 16px;
-    fill: white;
-  }
+  .sc-avatar svg { width: 16px; height: 16px; fill: white; }
 
   .sc-typing {
     display: flex;
@@ -270,14 +257,8 @@
     background: #f9fafb;
   }
 
-  #sc-input:focus {
-    border-color: #2e7d8c;
-    background: white;
-  }
-
-  #sc-input::placeholder {
-    color: #a0aec0;
-  }
+  #sc-input:focus { border-color: #2e7d8c; background: white; }
+  #sc-input::placeholder { color: #a0aec0; }
 
   #sc-send-btn {
     width: 40px;
@@ -293,21 +274,9 @@
     transition: transform 0.15s ease, opacity 0.15s;
   }
 
-  #sc-send-btn:hover {
-    transform: scale(1.05);
-  }
-
-  #sc-send-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  #sc-send-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: white;
-  }
+  #sc-send-btn:hover { transform: scale(1.05); }
+  #sc-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  #sc-send-btn svg { width: 18px; height: 18px; fill: white; }
 
   #sc-quick-replies {
     display: flex;
@@ -330,27 +299,15 @@
     white-space: nowrap;
   }
 
-  .sc-quick-btn:hover {
-    background: #2e7d8c;
-    color: white;
-  }
+  .sc-quick-btn:hover { background: #2e7d8c; color: white; }
 
   @media (max-width: 420px) {
-    #sc-chat-window {
-      width: calc(100vw - 24px);
-      right: 12px;
-      bottom: 90px;
-      height: 480px;
-    }
-    #sc-chat-btn {
-      right: 16px;
-      bottom: 20px;
-    }
+    #sc-chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; height: 480px; }
+    #sc-chat-btn { right: 16px; bottom: 20px; }
   }
 </style>
 
 <div id="sc-chat-widget">
-  <!-- 浮動按鈕 -->
   <button id="sc-chat-btn" onclick="scToggleChat()" aria-label="開啟客服">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
@@ -358,9 +315,7 @@
     <div id="sc-badge"></div>
   </button>
 
-  <!-- 聊天視窗 -->
   <div id="sc-chat-window">
-    <!-- 標頭 -->
     <div id="sc-chat-header">
       <div id="sc-header-avatar">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -378,7 +333,6 @@
       </button>
     </div>
 
-    <!-- 快捷回覆 -->
     <div id="sc-quick-replies">
       <button class="sc-quick-btn" onclick="scQuickSend('門診時間？')">門診時間</button>
       <button class="sc-quick-btn" onclick="scQuickSend('如何掛號？')">如何掛號</button>
@@ -386,10 +340,8 @@
       <button class="sc-quick-btn" onclick="scQuickSend('兒童早期療育')">早期療育</button>
     </div>
 
-    <!-- 訊息區 -->
     <div id="sc-messages"></div>
 
-    <!-- 輸入區 -->
     <div id="sc-input-area">
       <textarea
         id="sc-input"
@@ -414,6 +366,12 @@
   let scIsLoading = false;
   let scWelcomed = false;
 
+  function scClearInput() {
+    const input = document.getElementById('sc-input');
+    input.value = '';
+    input.style.height = 'auto';
+  }
+
   function scToggleChat() {
     scIsOpen = !scIsOpen;
     const win = document.getElementById('sc-chat-window');
@@ -437,7 +395,7 @@
   function scAddMessage(type, text) {
     const msgs = document.getElementById('sc-messages');
     const wrapper = document.createElement('div');
-    wrapper.className = `sc-msg ${type}`;
+    wrapper.className = 'sc-msg ' + type;
 
     if (type === 'bot') {
       const avatar = document.createElement('div');
@@ -491,12 +449,7 @@
     scIsLoading = true;
     sendBtn.disabled = true;
 
-    // 清空輸入框
-    input.value = '';
-    input.style.height = 'auto';
-    input.blur();
-    input.focus();
-
+    scClearInput();
     scAddMessage('user', message);
     scShowTyping();
 
@@ -521,9 +474,8 @@
   }
 
   function scQuickSend(text) {
-    const input = document.getElementById('sc-input');
-    input.value = text;
-    input.style.height = 'auto';
+    if (scIsLoading) return;
+    document.getElementById('sc-input').value = text;
     scSend();
   }
 
