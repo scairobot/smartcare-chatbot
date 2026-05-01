@@ -249,6 +249,41 @@
       });
     };
 
+    // 追蹤中文輸入法狀態
+    var scIsComposing = false;
+    var scInputEl = null;
+
+    // 等 DOM 插入後綁定事件
+    setTimeout(function() {
+      scInputEl = document.getElementById('sc-input');
+      if (!scInputEl) return;
+
+      scInputEl.addEventListener('compositionstart', function() {
+        scIsComposing = true;
+      });
+
+      scInputEl.addEventListener('compositionend', function() {
+        scIsComposing = false;
+      });
+
+      scInputEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !scIsComposing) {
+          e.preventDefault();
+          e.stopPropagation();
+          var message = scInputEl.value.trim();
+          scInputEl.value = '';
+          scDoSend(message);
+          return false;
+        }
+      });
+
+      document.getElementById('sc-send-btn').addEventListener('click', function() {
+        var message = scInputEl.value.trim();
+        scInputEl.value = '';
+        scDoSend(message);
+      });
+    }, 500);
+
     window.scSend = function() {
       var input = document.getElementById('sc-input');
       var message = input.value.trim();
@@ -262,15 +297,7 @@
     };
 
     window.scHandleKey = function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        e.stopPropagation();
-        var input = e.target;
-        var message = input.value.trim();
-        input.value = '';
-        scDoSend(message);
-        return false;
-      }
+      // 保留作為備用，主要由 addEventListener 處理
     };
 
     // iOS Safari fix
