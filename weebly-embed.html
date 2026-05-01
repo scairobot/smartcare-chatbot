@@ -26,7 +26,7 @@
 
   #sc-chat-window {
     position: fixed; bottom: 100px; right: 28px;
-    width: 360px; height: 520px; background: #fff;
+    width: 360px; height: 520px; background: #ffffff !important; opacity: 1; -webkit-backdrop-filter: none;
     border-radius: 20px; box-shadow: 0 12px 48px rgba(0,0,0,0.15);
     display: none; flex-direction: column; z-index: 9998;
     overflow: hidden; animation: scSlideUp 0.3s ease;
@@ -203,7 +203,7 @@
       if (!scWelcomed) {
         scWelcomed = true;
         setTimeout(function() {
-          scAddMessage('bot', '您好！我是實康復健科診所的 AI 客服助理 👋\n\n請問有什麼可以幫您的嗎？您可以詢問門診時間、掛號方式、診療項目等問題。');
+          scAddMessage('bot', '您好！我是實康復健科診所的 AI 客服助理\n\n請問有什麼可以幫您的嗎？您可以詢問門診時間、掛號方式、診療項目等問題。');
         }, 300);
       }
       setTimeout(function() { document.getElementById('sc-input').focus(); }, 100);
