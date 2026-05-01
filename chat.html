@@ -22,89 +22,77 @@
     --gray-900: #1a2e35;
   }
 
-  html { height: 100%; }
+  /* 關鍵：讓整個頁面固定，不跟著鍵盤移動 */
+  html {
+    height: -webkit-fill-available;
+  }
 
   body {
-    height: 100%;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
     font-family: 'Noto Sans TC', sans-serif;
     background: var(--gray-50);
     color: var(--gray-900);
     -webkit-text-size-adjust: 100%;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
 
   #app {
     display: flex;
     flex-direction: column;
+    flex: 1;
     width: 100%;
     max-width: 680px;
     margin: 0 auto;
     background: var(--white);
     box-shadow: 0 0 60px rgba(0,0,0,0.08);
-    /* 高度由 JS 動態設定 */
+    /* 關鍵：讓 messages 區可以滾動，其他固定 */
+    overflow: hidden;
+    height: 100vh;
+    height: -webkit-fill-available;
   }
 
   #chat-header {
     background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 60%, var(--teal-light) 100%);
-    padding: 0 20px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
     flex-shrink: 0;
-    min-height: 64px;
+    min-height: 60px;
     position: relative;
     overflow: hidden;
   }
 
-  #chat-header::before {
-    content: '';
-    position: absolute;
-    top: -30px; right: -30px;
-    width: 120px; height: 120px;
-    background: rgba(255,255,255,0.06);
-    border-radius: 50%;
-  }
-
   #header-avatar {
-    width: 42px; height: 42px;
+    width: 40px; height: 40px;
     background: rgba(255,255,255,0.18);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
     border: 1.5px solid rgba(255,255,255,0.25);
-    z-index: 1;
   }
   #header-avatar svg { width: 22px; height: 22px; fill: white; }
-
-  #header-info { flex: 1; z-index: 1; }
+  #header-info { flex: 1; }
   #header-name { color: white; font-size: 15px; font-weight: 600; }
-  #header-sub {
-    color: rgba(255,255,255,0.72); font-size: 11px; margin-top: 2px;
-    display: flex; align-items: center; gap: 5px;
-  }
-
-  .status-dot {
-    width: 6px; height: 6px; background: #7ee8a2;
-    border-radius: 50%; animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; } 50% { opacity: 0.5; }
-  }
+  #header-sub { color: rgba(255,255,255,0.72); font-size: 11px; margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .status-dot { width: 6px; height: 6px; background: #7ee8a2; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
 
   #back-btn {
     background: rgba(255,255,255,0.15);
     border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 10px;
-    color: white; padding: 7px 12px;
-    font-size: 12px; font-family: 'Noto Sans TC', sans-serif;
+    border-radius: 10px; color: white;
+    padding: 6px 12px; font-size: 12px;
+    font-family: 'Noto Sans TC', sans-serif;
     cursor: pointer; text-decoration: none;
-    display: flex; align-items: center; gap: 4px;
-    flex-shrink: 0; z-index: 1;
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
   }
   #back-btn svg { width: 14px; height: 14px; fill: white; }
 
   #quick-replies {
-    display: flex; gap: 8px; padding: 10px 16px;
+    display: flex; gap: 8px; padding: 8px 16px;
     overflow-x: auto; flex-shrink: 0;
     background: var(--white);
     border-bottom: 1px solid var(--gray-100);
@@ -113,7 +101,7 @@
   #quick-replies::-webkit-scrollbar { display: none; }
 
   .quick-btn {
-    flex-shrink: 0; font-size: 12px; padding: 6px 14px;
+    flex-shrink: 0; font-size: 12px; padding: 5px 13px;
     border-radius: 20px; border: 1.5px solid var(--teal);
     color: var(--teal); background: var(--white);
     cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
@@ -121,6 +109,7 @@
   }
   .quick-btn:active { background: var(--teal); color: white; }
 
+  /* 訊息區：flex:1 讓它佔滿剩餘空間，overflow-y:auto 讓它可以滾動 */
   #messages {
     flex: 1;
     overflow-y: auto;
@@ -130,13 +119,10 @@
     flex-direction: column;
     gap: 12px;
     background: var(--gray-50);
-    min-height: 0;
+    min-height: 0; /* 關鍵：flex 子項目需要這個才能正確收縮 */
   }
 
-  .date-divider {
-    text-align: center; font-size: 11px;
-    color: var(--gray-500); margin: 4px 0;
-  }
+  .date-divider { text-align: center; font-size: 11px; color: var(--gray-500); margin: 4px 0; }
 
   .welcome-card {
     background: linear-gradient(135deg, var(--teal-pale), #f0f9fb);
@@ -146,15 +132,8 @@
   .welcome-card h3 { font-size: 14px; font-weight: 600; color: var(--teal-dark); margin-bottom: 6px; }
   .welcome-card p { font-size: 13px; color: var(--gray-700); line-height: 1.6; }
 
-  .msg-row {
-    display: flex; gap: 8px; align-items: flex-end;
-    max-width: 82%;
-    animation: fadeUp 0.2s ease;
-  }
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .msg-row { display: flex; gap: 8px; align-items: flex-end; max-width: 85%; animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
   .msg-row.bot { align-self: flex-start; }
 
@@ -165,41 +144,20 @@
   }
   .msg-avatar svg { width: 16px; height: 16px; fill: white; }
 
-  .bubble {
-    padding: 10px 14px; border-radius: 18px;
-    font-size: 14px; line-height: 1.6;
-    word-break: break-word; white-space: pre-wrap;
-  }
-  .msg-row.user .bubble {
-    background: linear-gradient(135deg, var(--teal), var(--teal-dark));
-    color: white; border-bottom-right-radius: 4px;
-  }
-  .msg-row.bot .bubble {
-    background: var(--white); color: var(--gray-900);
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  }
+  .bubble { padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.6; word-break: break-word; white-space: pre-wrap; }
+  .msg-row.user .bubble { background: linear-gradient(135deg, var(--teal), var(--teal-dark)); color: white; border-bottom-right-radius: 4px; }
+  .msg-row.bot .bubble { background: var(--white); color: var(--gray-900); border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
 
   .typing-row { display: flex; gap: 8px; align-items: flex-end; align-self: flex-start; }
-  .typing-bubble {
-    background: var(--white); border-radius: 18px; border-bottom-left-radius: 4px;
-    padding: 12px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    display: flex; gap: 5px; align-items: center;
-  }
-  .t-dot {
-    width: 7px; height: 7px; background: var(--teal);
-    border-radius: 50%; animation: bounce 1.2s infinite; opacity: 0.5;
-  }
-  .t-dot:nth-child(2) { animation-delay: 0.2s; }
-  .t-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
+  .typing-bubble { background: var(--white); border-radius: 18px; border-bottom-left-radius: 4px; padding: 12px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); display: flex; gap: 5px; align-items: center; }
+  .t-dot { width: 7px; height: 7px; background: var(--teal); border-radius: 50%; animation: bounce 1.2s infinite; opacity: 0.5; }
+  .t-dot:nth-child(2){animation-delay:0.2s} .t-dot:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0);opacity:0.5} 30%{transform:translateY(-6px);opacity:1} }
 
+  /* 輸入區固定在底部 */
   #input-area {
     padding: 10px 16px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
     background: var(--white);
     border-top: 1px solid var(--gray-100);
     display: flex; gap: 10px; align-items: center;
@@ -211,13 +169,12 @@
     border: 1.5px solid var(--gray-300);
     border-radius: 24px;
     padding: 10px 18px;
-    font-size: 16px; /* 16px 防止 iOS 自動縮放 */
+    font-size: 16px; /* 防止 iOS 縮放 */
     font-family: 'Noto Sans TC', sans-serif;
     color: var(--gray-900);
     outline: none;
     background: var(--gray-50);
     -webkit-appearance: none;
-    appearance: none;
   }
   #msg-input:focus { border-color: var(--teal); background: var(--white); }
   #msg-input::placeholder { color: var(--gray-500); }
@@ -227,9 +184,7 @@
     background: linear-gradient(135deg, var(--teal), var(--teal-dark));
     border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(46,125,140,0.3);
-    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0; -webkit-tap-highlight-color: transparent;
   }
   #send-btn:active { opacity: 0.8; }
   #send-btn:disabled { opacity: 0.4; }
@@ -282,22 +237,9 @@
   var API_URL = 'https://smartcare-chatbot.vercel.app/api/chat';
   var isLoading = false;
 
-  // 設定 app 高度
-  function setAppHeight() {
-    var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    var app = document.getElementById('app');
-    app.style.height = h + 'px';
-  }
-
-  setAppHeight();
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener('resize', setAppHeight);
-  }
-  window.addEventListener('resize', setAppHeight);
-
   function scrollToBottom() {
     var msgs = document.getElementById('messages');
-    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 50);
   }
 
   function addMessage(type, text) {
@@ -352,10 +294,7 @@
     .then(function(r) { return r.json(); })
     .then(function(d) { removeTyping(); addMessage('bot', d.reply || '抱歉，請來電 02-26292000 詢問。'); })
     .catch(function() { removeTyping(); addMessage('bot', '抱歉，網路異常，請來電 02-26292000。'); })
-    .finally(function() {
-      isLoading = false; btn.disabled = false;
-      document.getElementById('msg-input').focus();
-    });
+    .finally(function() { isLoading = false; btn.disabled = false; });
   }
 
   function sendMsg() {
@@ -365,9 +304,7 @@
     doSend(msg);
   }
 
-  function quickSend(text) {
-    if (!isLoading) doSend(text);
-  }
+  function quickSend(text) { if (!isLoading) doSend(text); }
 
   function handleKey(e) {
     if (e.key === 'Enter') {
