@@ -1,6 +1,25 @@
+const ALLOWED_ORIGINS = [
+  'https://www.smartcare.com.tw',
+  'https://smartcare.com.tw',
+  'https://smartcare-chatbot.vercel.app',
+];
+
 export default async function handler(req, res) {
+  const origin = req.headers.origin || '';
+
+  // 檢查來源是否允許
+  const isAllowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o));
+
   // CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  if (isAllowed) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (req.method === 'OPTIONS') {
+    return res.status(403).end();
+  } else if (origin !== '') {
+    // 有 origin 但不在白名單裡，拒絕
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -31,11 +50,6 @@ export default async function handler(req, res) {
   const CLINIC_KNOWLEDGE = `
 你是實康復健科診所的AI客服助理。請用親切、專業的繁體中文回答，回答要簡潔清楚。超出範圍的問題請引導來電 02-26292000。
 
-【假日休診公告】
-- 2026年5月1日（五）至 5月3日 (日) 連假，診所不營業
-// - 2026年XX月XX日（XX）門診時間調整為 XX:XX-XX:XX
-- 如有疑問請來電 02-26292000 確認
-
 【基本資訊】
 - 名稱：實康復健科診所
 - 地址：新北市淡水區學府路36號2樓
@@ -47,7 +61,7 @@ export default async function handler(req, res) {
 | 醫師 | 週一 | 週二 | 週三 | 週四 | 週五 | 週六 |
 | 劉盈宏 | 早/午 | 晚 | 午 | - | 早/午 | - |
 | 毛琪瑛 | - | - | 早 | 早 | - | - |
-| 江唯真 | - | - | - | 晚 | - | 早 |
+| 江唯真 | - | - | 晚 | - | - | 早 |
 週日全天及週六下午/晚上休診。
 
 【復健治療服務時間】
@@ -85,7 +99,7 @@ export default async function handler(req, res) {
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
     const payload = {
       system_instruction: {
