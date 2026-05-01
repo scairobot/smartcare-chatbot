@@ -226,7 +226,7 @@
 
   <div id="input-area">
     <input type="text" id="msg-input" placeholder="請輸入您的問題..."
-      onkeydown="handleKey(event)" autocomplete="off" autocorrect="off" autocapitalize="off" />
+      onkeydown="handleKey(event)" oninput="onInputChange(this)" autocomplete="off" autocorrect="off" autocapitalize="off" />
     <button id="send-btn" onclick="sendMsg()">
       <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
@@ -236,6 +236,20 @@
 <script>
   var API_URL = 'https://smartcare-chatbot.vercel.app/api/chat';
   var isLoading = false;
+  var inputValue = '';
+
+  function onInputChange(el) {
+    inputValue = el.value;
+  }
+
+  function clearInput() {
+    inputValue = '';
+    var input = document.getElementById('msg-input');
+    input.value = '';
+    // 強制觸發 DOM 更新
+    input.setAttribute('value', '');
+    input.dispatchEvent(new Event('change'));
+  }
 
   function scrollToBottom() {
     var msgs = document.getElementById('messages');
@@ -298,9 +312,8 @@
   }
 
   function sendMsg() {
-    var input = document.getElementById('msg-input');
-    var msg = input.value.trim();
-    input.value = '';
+    var msg = inputValue.trim();
+    clearInput();
     doSend(msg);
   }
 
@@ -310,11 +323,8 @@
     if (e.key === 'Enter') {
       e.preventDefault();
       e.stopPropagation();
-      var input = e.target;
-      var msg = input.value.trim();
-      input.value = '';
-      input.blur();
-      input.focus();
+      var msg = inputValue.trim();
+      clearInput();
       doSend(msg);
       return false;
     }
