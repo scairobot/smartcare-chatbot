@@ -272,5 +272,36 @@
         return false;
       }
     };
+
+    // iOS Safari fix
+    function scUpdatePosition() {
+      var btn = document.getElementById('sc-chat-btn');
+      var win = document.getElementById('sc-chat-window');
+      if (!btn) return;
+      var viewW = window.innerWidth;
+      var rightOffset = viewW <= 420 ? 16 : 28;
+      var bottomOffset = viewW <= 420 ? 20 : 28;
+      btn.style.position = 'fixed';
+      btn.style.bottom = bottomOffset + 'px';
+      btn.style.right = rightOffset + 'px';
+      btn.style.top = 'auto';
+      btn.style.left = 'auto';
+      if (win && win.style.display !== 'none') {
+        var winW = viewW <= 420 ? viewW - 24 : 360;
+        var winH = viewW <= 420 ? 480 : 520;
+        var winBottom = bottomOffset + 60 + 12;
+        win.style.position = 'fixed';
+        win.style.bottom = winBottom + 'px';
+        win.style.right = rightOffset + 'px';
+        win.style.width = winW + 'px';
+        win.style.height = winH + 'px';
+        win.style.top = 'auto';
+        win.style.left = 'auto';
+      }
+    }
+    window.addEventListener('scroll', scUpdatePosition, { passive: true });
+    window.addEventListener('resize', scUpdatePosition, { passive: true });
+    window.addEventListener('touchmove', scUpdatePosition, { passive: true });
+    setTimeout(scUpdatePosition, 300);
   })();
 </script>
