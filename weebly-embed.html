@@ -1,306 +1,276 @@
 <!-- 實康復健科診所 AI 客服 - Weebly 嵌入程式碼 -->
 <!-- 將以下程式碼貼入 Weebly 的「Embed Code」區塊 -->
+<!-- 建議放在網頁的第一個區塊（最上方） -->
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&display=swap');
-
-  #sc-chat-widget * { box-sizing: border-box; font-family: 'Noto Sans TC', sans-serif; }
-
-  #sc-chat-btn {
-    position: fixed; bottom: 28px; right: 28px;
-    width: 60px; height: 60px; border-radius: 50%;
-    background: linear-gradient(135deg, #2e7d8c, #1a5f6e);
-    border: none; cursor: pointer;
-    box-shadow: 0 4px 20px rgba(46,125,140,0.45);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 9999; transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  #sc-chat-btn:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(46,125,140,0.55); }
-  #sc-chat-btn svg { width: 28px; height: 28px; fill: white; }
-
-  #sc-badge {
-    position: absolute; top: -2px; right: -2px;
-    width: 18px; height: 18px; background: #e05c5c;
-    border-radius: 50%; border: 2px solid white; display: none;
-  }
-
-  #sc-chat-window {
-    position: fixed; bottom: 100px; right: 28px;
-    width: 360px; height: 520px; background: #ffffff !important; opacity: 1; -webkit-backdrop-filter: none;
-    border-radius: 20px; box-shadow: 0 12px 48px rgba(0,0,0,0.15);
-    display: none; flex-direction: column; z-index: 9998;
-    overflow: hidden; animation: scSlideUp 0.3s ease;
-  }
-  @keyframes scSlideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  #sc-chat-header {
-    background: linear-gradient(135deg, #2e7d8c, #1a5f6e);
-    padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-  }
-  #sc-header-avatar {
-    width: 40px; height: 40px; background: rgba(255,255,255,0.2);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  #sc-header-avatar svg { width: 22px; height: 22px; fill: white; }
-  #sc-header-info { flex: 1; }
-  #sc-header-name { color: white; font-size: 14px; font-weight: 600; line-height: 1.2; }
-  #sc-header-status { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }
-  #sc-close-btn {
-    background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8);
-    padding: 4px; display: flex; align-items: center; justify-content: center;
-    border-radius: 6px; transition: background 0.2s;
-  }
-  #sc-close-btn:hover { background: rgba(255,255,255,0.15); color: white; }
-  #sc-close-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-  #sc-messages {
-    flex: 1; overflow-y: auto; padding: 16px;
-    display: flex; flex-direction: column; gap: 10px; background: #f7f8fa;
-  }
-  #sc-messages::-webkit-scrollbar { width: 4px; }
-  #sc-messages::-webkit-scrollbar-track { background: transparent; }
-  #sc-messages::-webkit-scrollbar-thumb { background: #d0d5dd; border-radius: 4px; }
-
-  .sc-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 88%; }
-  .sc-msg.user { align-self: flex-end; flex-direction: row-reverse; }
-  .sc-msg.bot { align-self: flex-start; }
-
-  .sc-bubble {
-    padding: 10px 14px; border-radius: 16px;
-    font-size: 13.5px; line-height: 1.55; word-break: break-word;
-  }
-  .sc-msg.user .sc-bubble {
-    background: linear-gradient(135deg, #2e7d8c, #1a5f6e);
-    color: white; border-bottom-right-radius: 4px;
-  }
-  .sc-msg.bot .sc-bubble {
-    background: white; color: #2d3748;
-    border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-  }
-
-  .sc-avatar {
-    width: 30px; height: 30px; border-radius: 50%;
-    background: linear-gradient(135deg, #2e7d8c, #1a5f6e);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  .sc-avatar svg { width: 16px; height: 16px; fill: white; }
-
-  .sc-typing {
-    display: flex; gap: 4px; align-items: center;
-    padding: 10px 14px; background: white; border-radius: 16px;
-    border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); width: fit-content;
-  }
-  .sc-dot {
-    width: 7px; height: 7px; background: #2e7d8c;
-    border-radius: 50%; animation: scBounce 1.2s infinite; opacity: 0.6;
-  }
-  .sc-dot:nth-child(2) { animation-delay: 0.2s; }
-  .sc-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes scBounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  #sc-input-area {
-    padding: 12px 16px; background: white;
-    border-top: 1px solid #edf0f4; display: flex; gap: 8px; align-items: center; flex-shrink: 0;
-  }
-  #sc-input {
-    flex: 1; border: 1.5px solid #e2e8f0; border-radius: 12px;
-    padding: 9px 14px; font-size: 13.5px; font-family: 'Noto Sans TC', sans-serif;
-    color: #2d3748; outline: none; line-height: 1.4;
-    transition: border-color 0.2s; background: #f9fafb;
-  }
-  #sc-input:focus { border-color: #2e7d8c; background: white; }
-  #sc-input::placeholder { color: #a0aec0; }
-
-  #sc-send-btn {
-    width: 40px; height: 40px; border-radius: 12px;
-    background: linear-gradient(135deg, #2e7d8c, #1a5f6e);
-    border: none; cursor: pointer; display: flex; align-items: center;
-    justify-content: center; flex-shrink: 0; transition: transform 0.15s ease, opacity 0.15s;
-  }
-  #sc-send-btn:hover { transform: scale(1.05); }
-  #sc-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  #sc-send-btn svg { width: 18px; height: 18px; fill: white; }
-
-  #sc-quick-replies {
-    display: flex; gap: 6px; padding: 8px 16px 0; flex-wrap: wrap; background: white;
-  }
-  .sc-quick-btn {
-    font-size: 11.5px; padding: 5px 10px; border-radius: 20px;
-    border: 1.5px solid #2e7d8c; color: #2e7d8c; background: white;
-    cursor: pointer; font-family: 'Noto Sans TC', sans-serif;
-    transition: all 0.15s; white-space: nowrap;
-  }
-  .sc-quick-btn:hover { background: #2e7d8c; color: white; }
-
-  @media (max-width: 420px) {
-    #sc-chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; height: 480px; }
-    #sc-chat-btn { right: 16px; bottom: 20px; }
-  }
 </style>
 
-<div id="sc-chat-widget">
-  <button id="sc-chat-btn" onclick="scToggleChat()" aria-label="開啟客服">
-    <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-    <div id="sc-badge"></div>
-  </button>
-
-  <div id="sc-chat-window">
-    <div id="sc-chat-header">
-      <div id="sc-header-avatar">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-      </div>
-      <div id="sc-header-info">
-        <div id="sc-header-name">實康復健科診所</div>
-        <div id="sc-header-status">● AI 客服助理</div>
-      </div>
-      <button id="sc-close-btn" onclick="scToggleChat()" aria-label="關閉">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-    </div>
-
-    <div id="sc-quick-replies">
-      <button class="sc-quick-btn" onclick="scQuickSend('門診時間？')">門診時間</button>
-      <button class="sc-quick-btn" onclick="scQuickSend('如何掛號？')">如何掛號</button>
-      <button class="sc-quick-btn" onclick="scQuickSend('診療項目有哪些？')">診療項目</button>
-      <button class="sc-quick-btn" onclick="scQuickSend('兒童早期療育')">早期療育</button>
-    </div>
-
-    <div id="sc-messages"></div>
-
-    <div id="sc-input-area">
-      <input
-        type="text"
-        id="sc-input"
-        placeholder="請輸入您的問題…"
-        onkeydown="scHandleKey(event)"
-      />
-      <button id="sc-send-btn" onclick="scSend()" aria-label="送出">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
-    </div>
-  </div>
-</div>
-
 <script>
-  var SC_API_URL = 'https://smartcare-chatbot.vercel.app/api/chat';
-  var scIsOpen = false;
-  var scIsLoading = false;
-  var scWelcomed = false;
+  // 動態插入到 document.body，跳出 iframe 限制
+  (function() {
+    var style = document.createElement('style');
+    style.textContent = [
+      '#sc-chat-widget * { box-sizing: border-box; font-family: "Noto Sans TC", sans-serif; }',
+      '#sc-chat-btn {',
+        'position: fixed; bottom: 28px; right: 28px;',
+        'width: 60px; height: 60px; border-radius: 50%;',
+        'background: linear-gradient(135deg, #2e7d8c, #1a5f6e);',
+        'border: none; cursor: pointer;',
+        'box-shadow: 0 4px 20px rgba(46,125,140,0.45);',
+        'display: flex; align-items: center; justify-content: center;',
+        'z-index: 2147483647; transition: transform 0.2s ease, box-shadow 0.2s ease;',
+      '}',
+      '#sc-chat-btn:hover { transform: scale(1.08); }',
+      '#sc-chat-btn svg { width: 28px; height: 28px; fill: white; }',
+      '#sc-badge {',
+        'position: absolute; top: -2px; right: -2px;',
+        'width: 18px; height: 18px; background: #e05c5c;',
+        'border-radius: 50%; border: 2px solid white; display: none;',
+      '}',
+      '#sc-chat-window {',
+        'position: fixed; bottom: 100px; right: 28px;',
+        'width: 360px; height: 520px;',
+        'background-color: #ffffff;',
+        'border-radius: 20px; box-shadow: 0 12px 48px rgba(0,0,0,0.2);',
+        'display: none; flex-direction: column;',
+        'z-index: 2147483646; overflow: hidden;',
+      '}',
+      '#sc-chat-header {',
+        'background: linear-gradient(135deg, #2e7d8c, #1a5f6e);',
+        'padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-shrink: 0;',
+      '}',
+      '#sc-header-avatar {',
+        'width: 40px; height: 40px; background: rgba(255,255,255,0.2);',
+        'border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;',
+      '}',
+      '#sc-header-avatar svg { width: 22px; height: 22px; fill: white; }',
+      '#sc-header-info { flex: 1; }',
+      '#sc-header-name { color: white; font-size: 14px; font-weight: 600; line-height: 1.2; }',
+      '#sc-header-status { color: rgba(255,255,255,0.75); font-size: 11px; margin-top: 2px; }',
+      '#sc-close-btn {',
+        'background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8);',
+        'padding: 4px; display: flex; align-items: center; justify-content: center;',
+        'border-radius: 6px;',
+      '}',
+      '#sc-close-btn svg { width: 18px; height: 18px; fill: currentColor; }',
+      '#sc-messages {',
+        'flex: 1; overflow-y: auto; padding: 16px;',
+        'display: flex; flex-direction: column; gap: 10px; background-color: #f7f8fa;',
+      '}',
+      '.sc-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 88%; }',
+      '.sc-msg.user { align-self: flex-end; flex-direction: row-reverse; }',
+      '.sc-msg.bot { align-self: flex-start; }',
+      '.sc-bubble {',
+        'padding: 10px 14px; border-radius: 16px;',
+        'font-size: 13.5px; line-height: 1.55; word-break: break-word;',
+      '}',
+      '.sc-msg.user .sc-bubble {',
+        'background: linear-gradient(135deg, #2e7d8c, #1a5f6e);',
+        'color: white; border-bottom-right-radius: 4px;',
+      '}',
+      '.sc-msg.bot .sc-bubble {',
+        'background-color: white; color: #2d3748;',
+        'border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.07);',
+      '}',
+      '.sc-avatar {',
+        'width: 30px; height: 30px; border-radius: 50%;',
+        'background: linear-gradient(135deg, #2e7d8c, #1a5f6e);',
+        'display: flex; align-items: center; justify-content: center; flex-shrink: 0;',
+      '}',
+      '.sc-avatar svg { width: 16px; height: 16px; fill: white; }',
+      '.sc-typing {',
+        'display: flex; gap: 4px; align-items: center;',
+        'padding: 10px 14px; background-color: white; border-radius: 16px;',
+        'border-bottom-left-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); width: fit-content;',
+      '}',
+      '.sc-dot {',
+        'width: 7px; height: 7px; background: #2e7d8c;',
+        'border-radius: 50%; animation: scBounce 1.2s infinite; opacity: 0.6;',
+      '}',
+      '.sc-dot:nth-child(2) { animation-delay: 0.2s; }',
+      '.sc-dot:nth-child(3) { animation-delay: 0.4s; }',
+      '@keyframes scBounce {',
+        '0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }',
+        '30% { transform: translateY(-6px); opacity: 1; }',
+      '}',
+      '#sc-quick-replies {',
+        'display: flex; gap: 6px; padding: 8px 16px 0; flex-wrap: wrap; background-color: white;',
+      '}',
+      '.sc-quick-btn {',
+        'font-size: 11.5px; padding: 5px 10px; border-radius: 20px;',
+        'border: 1.5px solid #2e7d8c; color: #2e7d8c; background-color: white;',
+        'cursor: pointer; transition: all 0.15s; white-space: nowrap;',
+      '}',
+      '.sc-quick-btn:hover { background-color: #2e7d8c; color: white; }',
+      '#sc-input-area {',
+        'padding: 12px 16px; background-color: white;',
+        'border-top: 1px solid #edf0f4; display: flex; gap: 8px; align-items: center; flex-shrink: 0;',
+      '}',
+      '#sc-input {',
+        'flex: 1; border: 1.5px solid #e2e8f0; border-radius: 12px;',
+        'padding: 9px 14px; font-size: 13.5px;',
+        'color: #2d3748; outline: none; background-color: #f9fafb;',
+      '}',
+      '#sc-input:focus { border-color: #2e7d8c; background-color: white; }',
+      '#sc-send-btn {',
+        'width: 40px; height: 40px; border-radius: 12px;',
+        'background: linear-gradient(135deg, #2e7d8c, #1a5f6e);',
+        'border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0;',
+      '}',
+      '#sc-send-btn:disabled { opacity: 0.5; cursor: not-allowed; }',
+      '#sc-send-btn svg { width: 18px; height: 18px; fill: white; }',
+      '@media (max-width: 420px) {',
+        '#sc-chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; height: 480px; }',
+        '#sc-chat-btn { right: 16px; bottom: 20px; }',
+      '}'
+    ].join('');
+    document.head.appendChild(style);
 
-  function scToggleChat() {
-    scIsOpen = !scIsOpen;
-    var win = document.getElementById('sc-chat-window');
-    var badge = document.getElementById('sc-badge');
-    if (scIsOpen) {
-      win.style.display = 'flex';
-      badge.style.display = 'none';
-      if (!scWelcomed) {
-        scWelcomed = true;
-        setTimeout(function() {
-          scAddMessage('bot', '您好！我是實康復健科診所的 AI 客服助理\n\n請問有什麼可以幫您的嗎？您可以詢問門診時間、掛號方式、診療項目等問題。');
-        }, 300);
+    var widget = document.createElement('div');
+    widget.id = 'sc-chat-widget';
+    widget.innerHTML = [
+      '<button id="sc-chat-btn" onclick="scToggleChat()" aria-label="開啟客服">',
+        '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>',
+        '<div id="sc-badge"></div>',
+      '</button>',
+      '<div id="sc-chat-window">',
+        '<div id="sc-chat-header">',
+          '<div id="sc-header-avatar"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg></div>',
+          '<div id="sc-header-info">',
+            '<div id="sc-header-name">實康復健科診所</div>',
+            '<div id="sc-header-status">AI 客服助理</div>',
+          '</div>',
+          '<button id="sc-close-btn" onclick="scToggleChat()"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>',
+        '</div>',
+        '<div id="sc-quick-replies">',
+          '<button class="sc-quick-btn" onclick="scQuickSend(\'門診時間？\')">門診時間</button>',
+          '<button class="sc-quick-btn" onclick="scQuickSend(\'如何掛號？\')">如何掛號</button>',
+          '<button class="sc-quick-btn" onclick="scQuickSend(\'診療項目有哪些？\')">診療項目</button>',
+          '<button class="sc-quick-btn" onclick="scQuickSend(\'兒童早期療育\')">早期療育</button>',
+        '</div>',
+        '<div id="sc-messages"></div>',
+        '<div id="sc-input-area">',
+          '<input type="text" id="sc-input" placeholder="請輸入您的問題..." onkeydown="scHandleKey(event)" />',
+          '<button id="sc-send-btn" onclick="scSend()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>',
+        '</div>',
+      '</div>'
+    ].join('');
+    document.body.appendChild(widget);
+
+    var SC_API_URL = 'https://smartcare-chatbot.vercel.app/api/chat';
+    var scIsOpen = false;
+    var scIsLoading = false;
+    var scWelcomed = false;
+
+    window.scToggleChat = function() {
+      scIsOpen = !scIsOpen;
+      var win = document.getElementById('sc-chat-window');
+      if (scIsOpen) {
+        win.style.display = 'flex';
+        if (!scWelcomed) {
+          scWelcomed = true;
+          setTimeout(function() {
+            scAddMessage('bot', '您好！我是實康復健科診所的 AI 客服助理\n\n請問有什麼可以幫您的嗎？您可以詢問門診時間、掛號方式、診療項目等問題。');
+          }, 300);
+        }
+        setTimeout(function() { document.getElementById('sc-input').focus(); }, 100);
+      } else {
+        win.style.display = 'none';
       }
-      setTimeout(function() { document.getElementById('sc-input').focus(); }, 100);
-    } else {
-      win.style.display = 'none';
-    }
-  }
+    };
 
-  function scAddMessage(type, text) {
-    var msgs = document.getElementById('sc-messages');
-    var wrapper = document.createElement('div');
-    wrapper.className = 'sc-msg ' + type;
-    if (type === 'bot') {
+    window.scAddMessage = function(type, text) {
+      var msgs = document.getElementById('sc-messages');
+      var wrapper = document.createElement('div');
+      wrapper.className = 'sc-msg ' + type;
+      if (type === 'bot') {
+        var avatar = document.createElement('div');
+        avatar.className = 'sc-avatar';
+        avatar.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
+        wrapper.appendChild(avatar);
+      }
+      var bubble = document.createElement('div');
+      bubble.className = 'sc-bubble';
+      bubble.style.whiteSpace = 'pre-wrap';
+      bubble.textContent = text;
+      wrapper.appendChild(bubble);
+      msgs.appendChild(wrapper);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+
+    window.scShowTyping = function() {
+      var msgs = document.getElementById('sc-messages');
+      var typing = document.createElement('div');
+      typing.className = 'sc-msg bot';
+      typing.id = 'sc-typing-indicator';
       var avatar = document.createElement('div');
       avatar.className = 'sc-avatar';
       avatar.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
-      wrapper.appendChild(avatar);
-    }
-    var bubble = document.createElement('div');
-    bubble.className = 'sc-bubble';
-    bubble.style.whiteSpace = 'pre-wrap';
-    bubble.textContent = text;
-    wrapper.appendChild(bubble);
-    msgs.appendChild(wrapper);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
+      var dots = document.createElement('div');
+      dots.className = 'sc-typing';
+      dots.innerHTML = '<div class="sc-dot"></div><div class="sc-dot"></div><div class="sc-dot"></div>';
+      typing.appendChild(avatar);
+      typing.appendChild(dots);
+      msgs.appendChild(typing);
+      msgs.scrollTop = msgs.scrollHeight;
+    };
 
-  function scShowTyping() {
-    var msgs = document.getElementById('sc-messages');
-    var typing = document.createElement('div');
-    typing.className = 'sc-msg bot';
-    typing.id = 'sc-typing-indicator';
-    var avatar = document.createElement('div');
-    avatar.className = 'sc-avatar';
-    avatar.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>';
-    var dots = document.createElement('div');
-    dots.className = 'sc-typing';
-    dots.innerHTML = '<div class="sc-dot"></div><div class="sc-dot"></div><div class="sc-dot"></div>';
-    typing.appendChild(avatar);
-    typing.appendChild(dots);
-    msgs.appendChild(typing);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
+    window.scRemoveTyping = function() {
+      var el = document.getElementById('sc-typing-indicator');
+      if (el) el.remove();
+    };
 
-  function scRemoveTyping() {
-    var indicator = document.getElementById('sc-typing-indicator');
-    if (indicator) indicator.remove();
-  }
+    window.scDoSend = function(message) {
+      if (!message || scIsLoading) return;
+      var sendBtn = document.getElementById('sc-send-btn');
+      scIsLoading = true;
+      sendBtn.disabled = true;
+      scAddMessage('user', message);
+      scShowTyping();
+      fetch(SC_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        scRemoveTyping();
+        scAddMessage('bot', data.reply || '抱歉，請來電 02-26292000 詢問。');
+      })
+      .catch(function() {
+        scRemoveTyping();
+        scAddMessage('bot', '抱歉，網路連線異常，請來電 02-26292000 或稍後再試。');
+      })
+      .finally(function() {
+        scIsLoading = false;
+        sendBtn.disabled = false;
+        document.getElementById('sc-input').focus();
+      });
+    };
 
-  function scDoSend(message) {
-    if (!message || scIsLoading) return;
-    var input = document.getElementById('sc-input');
-    var sendBtn = document.getElementById('sc-send-btn');
-    scIsLoading = true;
-    sendBtn.disabled = true;
-    input.value = '';
-    scAddMessage('user', message);
-    scShowTyping();
-    fetch(SC_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: message })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      scRemoveTyping();
-      scAddMessage('bot', data.reply || '抱歉，請來電 02-26292000 詢問。');
-    })
-    .catch(function() {
-      scRemoveTyping();
-      scAddMessage('bot', '抱歉，網路連線異常，請來電 02-26292000 或稍後再試。');
-    })
-    .finally(function() {
-      scIsLoading = false;
-      sendBtn.disabled = false;
-      document.getElementById('sc-input').focus();
-    });
-  }
-
-  function scSend() {
-    var message = document.getElementById('sc-input').value.trim();
-    scDoSend(message);
-  }
-
-  function scQuickSend(text) {
-    if (scIsLoading) return;
-    scDoSend(text);
-  }
-
-  function scHandleKey(e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      e.stopPropagation();
-      var message = e.target.value.trim();
-      e.target.value = '';
+    window.scSend = function() {
+      var input = document.getElementById('sc-input');
+      var message = input.value.trim();
+      input.value = '';
       scDoSend(message);
-      return false;
-    }
-  }
+    };
+
+    window.scQuickSend = function(text) {
+      if (scIsLoading) return;
+      scDoSend(text);
+    };
+
+    window.scHandleKey = function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.stopPropagation();
+        var input = e.target;
+        var message = input.value.trim();
+        input.value = '';
+        scDoSend(message);
+        return false;
+      }
+    };
+  })();
 </script>
