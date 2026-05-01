@@ -482,7 +482,34 @@
   function scHandleKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      scSend();
+      const input = e.target;
+      const message = input.value.trim();
+      if (!message || scIsLoading) return;
+      input.value = '';
+      input.style.height = 'auto';
+      scIsLoading = true;
+      document.getElementById('sc-send-btn').disabled = true;
+      scAddMessage('user', message);
+      scShowTyping();
+      fetch(SC_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      })
+      .then(r => r.json())
+      .then(data => {
+        scRemoveTyping();
+        scAddMessage('bot', data.reply || '抱歉，請來電 02-26292000 詢問。');
+      })
+      .catch(() => {
+        scRemoveTyping();
+        scAddMessage('bot', '抱歉，網路連線異常，請來電 02-26292000 或稍後再試。');
+      })
+      .finally(() => {
+        scIsLoading = false;
+        document.getElementById('sc-send-btn').disabled = false;
+        input.focus();
+      });
     }
   }
 
