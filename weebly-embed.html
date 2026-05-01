@@ -387,9 +387,7 @@
     </div>
 
     <!-- 訊息區 -->
-    <div id="sc-messages">
-      <!-- 歡迎訊息 -->
-    </div>
+    <div id="sc-messages"></div>
 
     <!-- 輸入區 -->
     <div id="sc-input-area">
@@ -410,9 +408,8 @@
 </div>
 
 <script>
-  // ⚠️ 請將下方網址換成你的 Vercel 部署網址
   const SC_API_URL = 'https://smartcare-chatbot.vercel.app/api/chat';
-  
+
   let scIsOpen = false;
   let scIsLoading = false;
   let scWelcomed = false;
@@ -420,7 +417,6 @@
   function scToggleChat() {
     scIsOpen = !scIsOpen;
     const win = document.getElementById('sc-chat-window');
-    const btn = document.getElementById('sc-chat-btn');
     const badge = document.getElementById('sc-badge');
 
     if (scIsOpen) {
@@ -440,7 +436,6 @@
 
   function scAddMessage(type, text) {
     const msgs = document.getElementById('sc-messages');
-
     const wrapper = document.createElement('div');
     wrapper.className = `sc-msg ${type}`;
 
@@ -495,8 +490,12 @@
 
     scIsLoading = true;
     sendBtn.disabled = true;
+
+    // 清空輸入框
     input.value = '';
     input.style.height = 'auto';
+    input.blur();
+    input.focus();
 
     scAddMessage('user', message);
     scShowTyping();
@@ -522,7 +521,9 @@
   }
 
   function scQuickSend(text) {
-    document.getElementById('sc-input').value = text;
+    const input = document.getElementById('sc-input');
+    input.value = text;
+    input.style.height = 'auto';
     scSend();
   }
 
