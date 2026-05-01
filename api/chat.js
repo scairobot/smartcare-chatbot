@@ -2,24 +2,21 @@ const ALLOWED_ORIGINS = [
   'https://www.smartcare.com.tw',
   'https://smartcare.com.tw',
   'https://smartcare-chatbot.vercel.app',
+  'http://smartcare-chatbot.vercel.app',
 ];
 
 export default async function handler(req, res) {
   const origin = req.headers.origin || '';
 
-  // 檢查來源是否允許
-  const isAllowed = ALLOWED_ORIGINS.some(o => origin.startsWith(o));
+  // 沒有 origin（伺服器端呼叫）或在白名單裡，都允許
+  const isAllowed = !origin || ALLOWED_ORIGINS.some(o => origin.startsWith(o));
 
-  // CORS headers
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else if (req.method === 'OPTIONS') {
-    return res.status(403).end();
-  } else if (origin !== '') {
-    // 有 origin 但不在白名單裡，拒絕
+  if (!isAllowed) {
     return res.status(403).json({ error: 'Forbidden' });
   }
 
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -99,7 +96,7 @@ export default async function handler(req, res) {
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${GEMINI_API_KEY}`;
 
     const payload = {
       system_instruction: {
