@@ -309,9 +309,14 @@
   function handleKey(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
-      var msg = e.target.value.trim();
-      e.target.value = '';
+      e.stopPropagation();
+      var input = e.target;
+      var msg = input.value.trim();
+      input.value = '';
+      input.blur();
+      input.focus();
       doSend(msg);
+      return false;
     }
   }
 </script>
