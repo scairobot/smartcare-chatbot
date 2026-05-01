@@ -1,0 +1,9 @@
+{
+  "name": "smartcare-chatbot",
+  "version": "1.0.0",
+  "description": "實康復健科診所 AI 客服後端",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
