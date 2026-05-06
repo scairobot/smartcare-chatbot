@@ -37,7 +37,7 @@ const FAQ = [
   // 門診時間
   {
     keywords: ['門診時間', '門診', '看診時間', '幾點', '開診', '什麼時候', '診療時間'],
-    answer: '門診時刻表：\n\n早診 09:00-12:00\n• 週一、五：劉盈宏醫師\n• 週三、四：毛琪瑛醫師\n• 週六：江唯真醫師\n\n午診 14:00-17:00\n• 週一、三、五：劉盈宏醫師\n\n晚診 18:00-21:00\n• 週二：劉盈宏醫師\n• 週四：江唯真醫師\n\n週日全天及週六下午/晚上休診。'
+    answer: '門診時刻表：\n\n早診 09:00-12:00\n• 週一、五：劉盈宏醫師\n• 週三：毛琪瑛醫師\n• 週四：毛琪瑛醫師\n• 週六：江唯真醫師\n\n午診 14:00-17:00\n• 週一、三、五：劉盈宏醫師\n\n晚診 18:00-21:00\n• 週二：劉盈宏醫師\n• 週四：江唯真醫師\n\n週日全天及週六下午/晚上休診。'
   },
   // 復健治療時間
   {
@@ -116,9 +116,27 @@ const FAQ = [
   }
 ];
 
+// 時間相關詞彙 - 含這些詞的問題直接送 Gemini 判斷
+const TIME_KEYWORDS = [
+  '今天', '今日', '現在', '目前', '這週', '本週', '這禮拜',
+  '明天', '明日', '後天', '昨天', '幾號', '幾月', '星期幾',
+  '週一', '週二', '週三', '週四', '週五', '週六', '週日',
+  '禮拜一', '禮拜二', '禮拜三', '禮拜四', '禮拜五', '禮拜六', '禮拜日',
+  '上午', '下午', '早上', '晚上', '中午', '幾點', '有沒有', '有開', '有上班',
+  '休診', '休假', '放假', '連假', '假日'
+];
+
 // 比對關鍵字函式
 function findFAQ(message) {
   const msg = message.toLowerCase().trim();
+
+  // 含時間詞的問題直接送 Gemini，不用 FAQ 回答
+  for (const tw of TIME_KEYWORDS) {
+    if (msg.includes(tw)) {
+      return null;
+    }
+  }
+
   for (const item of FAQ) {
     for (const keyword of item.keywords) {
       if (msg.includes(keyword.toLowerCase())) {
@@ -162,6 +180,64 @@ export default async function handler(req, res) {
 
   // FAQ 找不到才呼叫 Gemini
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const SPREADSHEET_ID = '1ElYYK3wK-M0n11yxinpKcuBeHHmKuG_YY6AYvp355TU';
+
+  // 寫入 Google Sheets
+  async function logToSheets(question, answer, source) {
+    try {
+      const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+
+      // 產生 JWT token
+      const header = { alg: 'RS256', typ: 'JWT' };
+      const now = Math.floor(Date.now() / 1000);
+      const claim = {
+        iss: serviceAccount.client_email,
+        scope: 'https://www.googleapis.com/auth/spreadsheets',
+        aud: 'https://oauth2.googleapis.com/token',
+        exp: now + 3600,
+        iat: now
+      };
+
+      const encode = (obj) => Buffer.from(JSON.stringify(obj)).toString('base64url');
+      const signingInput = `${encode(header)}.${encode(claim)}`;
+
+      const { createSign } = await import('crypto');
+      const sign = createSign('RSA-SHA256');
+      sign.update(signingInput);
+      const signature = sign.sign(serviceAccount.private_key, 'base64url');
+      const jwt = `${signingInput}.${signature}`;
+
+      // 取得 access token
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+      });
+      const tokenData = await tokenRes.json();
+      const accessToken = tokenData.access_token;
+
+      // 取得台灣時間
+      const twNow = new Date(Date.now() + 8 * 60 * 60 * 1000);
+      const timeStr = twNow.toISOString().replace('T', ' ').substring(0, 19);
+
+      // 寫入試算表
+      await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/A:E:append?valueInputOption=USER_ENTERED`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            values: [[timeStr, source, question, answer, '']]
+          })
+        }
+      );
+    } catch (err) {
+      console.error('Sheets log error:', err);
+    }
+  }
 
   const now = new Date();
   const twTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
@@ -198,14 +274,8 @@ export default async function handler(req, res) {
 - 物理治療1次門診最多6次，需30天內完成
 
 【假日休診公告】
-以下為2026年國定假日，診所配合休診（週六日本就休診不另列）：
-- 2026年5月1日（五）勞動節，與週末連假共3天（5/1-5/3）
-- 2026年6月19日（五）端午節，與週末連假共3天（6/19-6/21）
-- 2026年9月25日（五）中秋節，與週末及週一連假共4天（9/25-9/28）
-- 2026年10月10日（六）國慶日，補假10/9（五），連假共3天（10/9-10/11）
-- 2026年10月25日（日）台灣光復暨金門古寧頭大捷紀念日，補假10/26（一），連假共3天（10/24-10/26）
-- 2026年12月25日（五）行憲紀念日，與週末連假共3天（12/25-12/27）
-如有疑問請來電 02-26292000 確認。
+- 2026年5月1日 休假
+- 2026年5月2日 休假
 
 【回答「今天有沒有看診」的規則】
 1. 先確認現在台灣時間是星期幾、幾月幾日
@@ -241,6 +311,8 @@ export default async function handler(req, res) {
       const rawText = result.candidates[0].content.parts[0].text;
       // 移除 markdown 符號
       const text = rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/#{1,6}\s/g, '').replace(/`/g, '').trim();
+      // 記錄到 Google Sheets（不等待，不影響回應速度）
+      logToSheets(message, text, origin.includes('smartcare.com.tw') ? '官網' : '客服頁面');
       return res.status(200).json({ reply: text });
     } else {
       return res.status(200).json({ reply: '抱歉，目前系統忙碌中，請來電 02-26292000 或稍後再試。' });
