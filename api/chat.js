@@ -311,8 +311,8 @@ export default async function handler(req, res) {
       const rawText = result.candidates[0].content.parts[0].text;
       // 移除 markdown 符號
       const text = rawText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/#{1,6}\s/g, '').replace(/`/g, '').trim();
-      // 記錄到 Google Sheets（不等待，不影響回應速度）
-      logToSheets(message, text, origin.includes('smartcare.com.tw') ? '官網' : '客服頁面');
+      // 記錄到 Google Sheets（等待完成才回應，確保資料寫入）
+      await logToSheets(message, text, origin.includes('smartcare.com.tw') ? '官網' : '客服頁面');
       return res.status(200).json({ reply: text });
     } else {
       return res.status(200).json({ reply: '抱歉，目前系統忙碌中，請來電 02-26292000 或稍後再試。' });
