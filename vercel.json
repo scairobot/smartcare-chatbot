@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/upload.js": {
-      "maxDuration": 300
+      "maxDuration": 60
     }
   }
 }
