@@ -1,6 +1,7 @@
 {
-  "routes": [
-    { "src": "/chat", "dest": "/chat.html" },
-    { "src": "/api/(.*)", "dest": "/api/$1" }
-  ]
+  "functions": {
+    "api/upload.js": {
+      "maxDuration": 300
+    }
+  }
 }
