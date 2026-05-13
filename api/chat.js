@@ -1,6 +1,7 @@
 // ============================================================
 // 實康復健科診所 AI 客服後端 (Vercel)
 // FAQ 和診所資訊從 Google Sheets 讀取
+// RAG 知識庫從 Supabase 讀取（衛教文章等）
 // ============================================================
 
 const ALLOWED_ORIGINS = [
@@ -11,6 +12,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 const SPREADSHEET_ID = '1ElYYK3wK-M0n11yxinpKcuBeHHmKuG_YY6AYvp355TU';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
 
 // 時間相關詞彙 — 含這些詞直接送 Gemini，不走 FAQ
 const TIME_KEYWORDS = [
@@ -21,6 +24,54 @@ const TIME_KEYWORDS = [
   '上午', '下午', '早上', '晚上', '中午', '幾點', '有沒有', '有開', '有上班',
   '休診', '休假', '放假', '連假', '假日'
 ];
+
+// ── RAG 向量搜尋 ────────────────────────────────────────────
+async function searchRAG(query, geminiApiKey, topK = 3) {
+  try {
+    // 把問題轉成向量
+    const embedRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${geminiApiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'models/text-embedding-004',
+          content: { parts: [{ text: query }] }
+        })
+      }
+    );
+    const embedData = await embedRes.json();
+    if (!embedData.embedding?.values) return '';
+
+    // 搜尋 Supabase
+    const searchRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/match_knowledge`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
+        'apikey': SUPABASE_PUBLISHABLE_KEY
+      },
+      body: JSON.stringify({
+        query_embedding: embedData.embedding.values,
+        match_threshold: 0.7,
+        match_count: topK
+      })
+    });
+
+    const results = await searchRes.json();
+    if (!Array.isArray(results) || results.length === 0) return '';
+
+    // 組成 context 文字
+    let context = '\n\n【相關衛教資料】\n';
+    results.forEach((r, i) => {
+      context += `(${i+1}) ${r.title}：\n${r.content}\n\n`;
+    });
+    return context;
+  } catch (err) {
+    console.error('RAG search error:', err);
+    return '';
+  }
+}
 
 // ── Google Sheets 認證 ──────────────────────────────────────
 async function getAccessToken(serviceAccount) {
@@ -182,8 +233,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ reply: faqAnswer });
   }
 
-  // ── 送 Gemini ──
+  // ── RAG 搜尋（衛教文章）──
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const ragContext = await searchRAG(message, GEMINI_API_KEY);
 
   const now = new Date();
   const twTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
@@ -193,7 +245,8 @@ export default async function handler(req, res) {
   const minute = String(twTime.getUTCMinutes()).padStart(2, '0');
   const timeContext = `【現在時間】台灣時間 ${dayName} ${hour}:${minute}`;
 
-  const clinicKnowledge = buildKnowledge(infoRows);
+  // ── 送 Gemini ──
+  const clinicKnowledge = buildKnowledge(infoRows) + ragContext;
 
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${GEMINI_API_KEY}`;
