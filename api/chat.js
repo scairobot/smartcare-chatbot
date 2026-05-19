@@ -250,7 +250,7 @@ export default async function handler(req, res) {
   const clinicKnowledge = buildKnowledge(infoRows) + ragContext;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
     const payload = {
       system_instruction: { parts: [{ text: clinicKnowledge }] },
       contents: [{ role: 'user', parts: [{ text: `${timeContext}\n${message}` }] }],
