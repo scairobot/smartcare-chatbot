@@ -242,9 +242,11 @@ export default async function handler(req, res) {
   const twTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
   const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   const dayName = days[twTime.getUTCDay()];
+  const month = twTime.getUTCMonth() + 1;
+  const date = twTime.getUTCDate();
   const hour = twTime.getUTCHours();
   const minute = String(twTime.getUTCMinutes()).padStart(2, '0');
-  const timeContext = `【現在時間】台灣時間 ${dayName} ${hour}:${minute}`;
+  const timeContext = `【現在時間】台灣時間 ${twTime.getUTCFullYear()}年${month}月${date}日 ${dayName} ${hour}:${minute}`;
 
   // ── 送 Gemini ──
   const clinicKnowledge = buildKnowledge(infoRows) + ragContext;
