@@ -166,7 +166,7 @@ ${info['週六'] || '週六僅早診'}。${info['週日'] || '週日全天休診
 - ${info['物理治療次數']}
 
 【假日休診公告】
-${info['假日公告'] ? info['假日公告'].replace(/｜/g, '\n- ').replace(/^/, '- ') : '目前無特殊休診公告，依正常門診時間運作'}
+${info['假日公告'] ? info['假日公告'].replace(/[｜|]/g, '\n- ').replace(/^/, '- ') : '目前無特殊休診公告，依正常門診時間運作'}
 
 【回答「今天有沒有看診」的規則】
 1. 先確認現在台灣時間是星期幾、幾月幾日
@@ -242,15 +242,17 @@ export default async function handler(req, res) {
   const twTime = new Date(now.getTime() + 8 * 60 * 60 * 1000);
   const days = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
   const dayName = days[twTime.getUTCDay()];
+  const month = twTime.getUTCMonth() + 1;
+  const date = twTime.getUTCDate();
   const hour = twTime.getUTCHours();
   const minute = String(twTime.getUTCMinutes()).padStart(2, '0');
-  const timeContext = `【現在時間】台灣時間 ${dayName} ${hour}:${minute}`;
+  const timeContext = `【現在時間】台灣時間 ${twTime.getUTCFullYear()}年${month}月${date}日 ${dayName} ${hour}:${minute}`;
 
   // ── 送 Gemini ──
   const clinicKnowledge = buildKnowledge(infoRows) + ragContext;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${GEMINI_API_KEY}`;
     const payload = {
       system_instruction: { parts: [{ text: clinicKnowledge }] },
       contents: [{ role: 'user', parts: [{ text: `${timeContext}\n${message}` }] }],
