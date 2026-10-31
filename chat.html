@@ -108,6 +108,7 @@
     white-space: nowrap; -webkit-tap-highlight-color: transparent;
   }
   .quick-btn:active { background: var(--teal); color: white; }
+  a.quick-btn { display: inline-flex; align-items: center; text-decoration: none; }
 
   /* 訊息區：flex:1 讓它佔滿剩餘空間，overflow-y:auto 讓它可以滾動 */
   #messages {
@@ -209,12 +210,12 @@
 
   <div id="quick-replies">
     <button class="quick-btn" onclick="quickSend('門診時間？')">門診時間</button>
+    <a class="quick-btn" href="https://www.mainpi.com/query?i=3700" target="_blank" rel="noopener noreferrer">看診進度</a>
     <button class="quick-btn" onclick="quickSend('如何掛號？')">如何掛號</button>
     <button class="quick-btn" onclick="quickSend('診療項目有哪些？')">診療項目</button>
     <button class="quick-btn" onclick="quickSend('兒童早期療育')">早期療育</button>
     <button class="quick-btn" onclick="quickSend('彼拉提斯課程')">彼拉提斯</button>
     <button class="quick-btn" onclick="quickSend('掛號費多少？')">掛號費</button>
-    <button class="quick-btn" onclick="window.open('https://www.mainpi.com/query?i=3700', '_blank', 'noopener')">看診進度</button>
   </div>
 
   <div id="messages">
